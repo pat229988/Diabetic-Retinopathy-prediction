@@ -1,7 +1,12 @@
 import streamlit as st
 from  PIL import Image
 import numpy as np
-import tensorflow as tf
+#import tensorflow as tf
+from tensorflow import Graph as Graph
+from tensorflow import import_graph_def
+from tensorflow.compat.v1 import GraphDef as GraphDef
+from tensorflow.compat.v1 import Session as Session
+from tensorflow.io.gfile import GFile as GFile
 from object_detection.utils import visualization_utils as vis_util
 from object_detection.utils import label_map_util
 
@@ -14,13 +19,13 @@ MODEL_NAME = 'E:\AIML-\Diabetic-Ratinopathy-master\optic_disc_macula_graph'
 PATH_TO_CKPT = 'resnet-inference-graph.pb'
 NUM_CLASSES = 2
 
-detection_graph = tf.Graph()
+detection_graph = Graph()
 with detection_graph.as_default():
-    od_graph_def = tf.compat.v1.GraphDef()
-    with tf.io.gfile.GFile(PATH_TO_CKPT, 'rb') as fid:
+    od_graph_def = GraphDef()
+    with GFile(PATH_TO_CKPT, 'rb') as fid:
         serialized_graph = fid.read()
         od_graph_def.ParseFromString(serialized_graph)
-        tf.import_graph_def(od_graph_def, name='')
+        import_graph_def(od_graph_def, name='')
 
 
 def load_image_into_numpy_array(image):
@@ -34,7 +39,7 @@ dmp =[]
 
 def pred(img):
     with detection_graph.as_default():
-        with tf.compat.v1.Session(graph=detection_graph) as sess:
+        with Session(graph=detection_graph) as sess:
             # Definite input and output Tensors for detection_graph
             image_tensor = detection_graph.get_tensor_by_name('image_tensor:0')
             # Each box represents a part of the image where a particular object was detected.
